@@ -1,0 +1,14 @@
+from app import create_app
+
+app = create_app()
+
+
+if __name__ == "__main__":
+    host = app.config.get("APP_HOST", "0.0.0.0")
+    port = int(app.config.get("APP_PORT", 5000))
+    app.run(
+        host=host,
+        port=port,
+        debug=bool(app.config.get("DEBUG", False)),
+        use_reloader=False,
+    )

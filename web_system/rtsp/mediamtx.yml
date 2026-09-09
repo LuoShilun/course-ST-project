@@ -1,0 +1,15 @@
+# MediaMTX basic config for local RTSP server
+# Default RTSP endpoint: rtsp://localhost:8554
+# REST API endpoint: http://localhost:9997
+
+logLevel: info
+
+rtsp: yes
+rtspAddress: :8554
+
+api: yes
+apiAddress: :9997
+
+paths:
+  all:
+    source: publisher

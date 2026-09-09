@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-main: radial-gradient(circle at 0% -16%, #dcf5ff 0%, #edf9ff 36%, #f5fbff 70%, #f9fcff 100%);
+  --bg-elevated: linear-gradient(145deg, #ffffff, #f4f9ff);
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --text-main: #14324d;
+  --text-sub: #56708b;
+  --primary: #0f8ec7;
+  --primary-soft: rgba(15, 142, 199, 0.14);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --border-soft: rgba(24, 88, 136, 0.14);
+  --shadow-soft: 0 10px 24px rgba(9, 58, 101, 0.12);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Fira Sans', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  color: var(--text-main);
+  background: var(--bg-main);
+}
+
+body {
+  letter-spacing: 0.1px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-wrap {
+  width: 100%;
+  min-height: 100%;
+  padding: 18px;
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.section-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.section-subtitle {
+  margin-top: 6px;
+  color: var(--text-sub);
+  font-size: 13px;
+}
+
+.mono {
+  font-family: 'Fira Code', Consolas, monospace;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(87, 130, 174, 0.36);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(219, 235, 249, 0.7);
+}
+
+.el-message {
+  border-radius: 10px;
+}
+
+.el-button {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: inset 0 0 0 1px rgba(106, 146, 184, 0.24) !important;
+}
+
+.el-table {
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(224, 240, 250, 0.95);
+  --el-table-row-hover-bg-color: rgba(15, 142, 199, 0.08);
+  --el-table-border-color: rgba(128, 164, 198, 0.24);
+  --el-table-header-text-color: #1f4a6f;
+  --el-table-text-color: #2c5478;
+  background: transparent;
+}
+
+.el-menu {
+  --el-menu-bg-color: transparent;
+  --el-menu-text-color: #4f6f8f;
+  --el-menu-hover-bg-color: rgba(15, 142, 199, 0.12);
+  --el-menu-active-color: #134468;
+}
+
+.el-menu-item.is-active {
+  background: linear-gradient(90deg, rgba(15, 142, 199, 0.2), rgba(15, 142, 199, 0.04));
+  border-radius: 10px;
+}
+
+.el-tag {
+  border-radius: 999px;
+}
+
+@media (max-width: 980px) {
+  .page-wrap {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

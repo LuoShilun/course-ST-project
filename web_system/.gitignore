@@ -1,0 +1,39 @@
+# Local settings and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Dependencies, builds, and caches
+**/node_modules/
+**/dist/
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+**/.vitest/
+**/htmlcov/
+.coverage*
+**/.idea/
+**/.vscode/
+frontend/build_output.log
+
+# Runtime data (keep small course fixtures separately in testdata/)
+backend/instance/
+backend/logs/
+backend/uploads/
+backend/uploads_test/
+backend/data/knowledge_base/
+*.db
+*.sqlite*
+
+# Model weights and locally installed binaries
+*.pt
+*.pth
+*.onnx
+*.ckpt
+rtsp/bin/
+
+# Office lock files
+~$*
