@@ -1,0 +1,35 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- D:\Anaconda\python.exe
+rootdir: E:\MyProjectWorkSpace\underwater_project\web_system\web_system\testing
+configfile: pytest.ini
+testpaths: member_lsl
+plugins: anyio-4.2.0, langsmith-0.7.30, asyncio-1.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 34 items
+
+member_lsl/test_detection_api.py::test_models_list_ok PASSED     [  2%]
+member_lsl/test_detection_api.py::test_detection_requires_token PASSED [  5%]
+member_lsl/test_detection_api.py::test_detect_image_without_file PASSED [  8%]
+member_lsl/test_detection_api.py::test_detect_image_empty_filename PASSED [ 11%]
+member_lsl/test_detection_api.py::test_detect_image_not_an_image PASSED [ 14%]
+member_lsl/test_detection_api.py::test_detect_image_truncated_jpeg PASSED [ 17%]
+member_lsl/test_detection_api.py::test_detect_image_success_and_persist PASSED [ 20%]
+member_lsl/test_detection_api.py::test_detect_image_record_consistency PASSED [ 23%]
+member_lsl/test_detection_api.py::test_score_thresh_boundary PASSED [ 26%]
+member_lsl/test_detection_api.py::test_invalid_model_key_rejected XFAIL [ 29%]
+member_lsl/test_detection_api.py::test_chinese_filename_kept XFAIL [ 32%]
+member_lsl/test_detection_api.py::test_admin_invalid_robot_id XFAIL [ 35%]
+member_lsl/test_detection_api.py::test_detection_history_isolation PASSED [ 38%]
+member_lsl/test_detection_api.py::test_video_task_full_flow PASSED [ 41%]
+member_lsl/test_detection_api.py::test_video_task_cross_user_denied PASSED [ 44%]
+member_lsl/test_detection_api.py::test_realtime_session_lifecycle PASSED [ 47%]
+member_lsl/test_detection_ui.py::test_model_select_default_value XFAIL [ 50%]
+
+
+- generated xml file: E:\MyProjectWorkSpace\underwater_project\web_system\web_system\testing\reports\junit.xml -
+=========================== short test summary info ===========================
+XFAIL member_lsl/test_detection_api.py::test_invalid_model_key_rejected - BUG-04���Ƿ� model_key ����Ĭ������δ���ش���
+XFAIL member_lsl/test_detection_api.py::test_chinese_filename_kept - BUG-05�������ļ����� secure_filename �ƻ�����������ʧԭ������չ��
+XFAIL member_lsl/test_detection_api.py::test_admin_invalid_robot_id - BUG-01��robot_id ����������δ�����쳣������ 500 ����ҳ
+XFAIL member_lsl/test_detection_ui.py::test_model_select_default_value - BUG-06��Ĭ�� model_key Ϊ mock-default������ѡ���б��У���������ʾΪ��
+======================= 26 passed, 8 xfailed in 33.38s ========================
