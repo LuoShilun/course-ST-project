@@ -117,3 +117,45 @@ def test_detect_image_record_consistency(api_user1, actual):
         assert abs(float(rec["confidence"]) - float(rep["score"])) < 1e-6, f"置信度不一致：{rec} vs {rep}"
     actual(f"记录数 {before}->{after}；检测到 {len(detections)} 个目标（垃圾 {len(trash)} 个），"
            f"落库 detected_type={rec['detected_type']}、confidence={rec['confidence']}、is_trash={rec['is_trash']}")
+
+# 07：传入非法 model_key 时，接口是否应返回错误而非静默降级。（错误推测法）
+@pytest.mark.api
+@pytest.mark.defect
+@pytest.mark.case("TC-DET-07")
+@pytest.mark.xfail(strict=True, reason="BUG-04：非法 model_key 被静默降级，未返回错误")
+def test_invalid_model_key_rejected(api_user1, actual):
+    resp = api_user1.detect_image(image_bytes("trash_bio"), "bad_model.jpg",
+                                  model_key="not-exist.pt", score_thresh=0.25)
+    body = ApiClient.body(resp)
+    rec = api_user1.latest_record("image")
+    actual(f"HTTP {resp.status_code}，model_status={body['data'].get('model_status') if body.get('data') else None}，"
+           f"detections={len(body['data'].get('detections', [])) if body.get('data') else None}，"
+           f"落库 detected_type={rec['detected_type']}、model_key={rec['details'].get('model_key')}")
+    assert resp.status_code >= 400, f"非法模型键应被拒绝，实际 {dump(resp)}"
+
+
+# 08：中文文件名上传后，落盘 media_path 是否保留中文原名与 .png 扩展名。（边界值分析）
+@pytest.mark.api
+@pytest.mark.defect
+@pytest.mark.case("TC-DET-08")
+@pytest.mark.xfail(strict=True, reason="BUG-05：中文文件名被 secure_filename 破坏，落盘名丢失原名与扩展名")
+def test_chinese_filename_kept(api_user1, actual):
+    assert_ok(api_user1.detect_image(image_bytes("png"), "水下垃圾样本.png",
+                                     model_key="student.pt", score_thresh=0.25))
+    rec = api_user1.latest_record("image")
+    media_path = rec["media_path"] or ""
+    actual(f"落库 media_path={media_path}")
+    assert "水下垃圾样本" in media_path and media_path.lower().endswith(".png"), \
+        f"落盘文件名应保留中文原名与扩展名，实际 {media_path}"
+
+# 09：robot_id 传入非整数 "abc" 时，接口是否返回 4xx 而非500调试页。（错误推测法）
+@pytest.mark.api
+@pytest.mark.defect
+@pytest.mark.case("TC-DET-09")
+@pytest.mark.xfail(strict=True, reason="BUG-01：robot_id 非整数导致未捕获异常，返回 500 调试页")
+def test_admin_invalid_robot_id(api_admin, actual):
+    resp = api_admin.detect_image(image_bytes("plain"), "plain.jpg", robot_id="abc")
+    actual(dump(resp, 200))
+    assert resp.status_code < 500, f"参数错误不应返回 5xx，实际 {dump(resp)}"
+    assert_error(resp, http_status=400)
+
