@@ -159,3 +159,95 @@ def test_admin_invalid_robot_id(api_admin, actual):
     assert resp.status_code < 500, f"参数错误不应返回 5xx，实际 {dump(resp)}"
     assert_error(resp, http_status=400)
 
+# 10：检测历史记录是否按用户隔离，user1/user2 各自只能看到自己的图片与视频记录。（场景法）
+@pytest.mark.api
+@pytest.mark.case("TC-DET-10")
+def test_detection_history_isolation(api_user1, api_user2, actual):
+    img1 = assert_ok(api_user1.image_records())
+    vid1 = assert_ok(api_user1.video_records())
+    img2 = assert_ok(api_user2.image_records())
+    vid2 = assert_ok(api_user2.video_records())
+    assert {r["user_id"] for r in img1} <= {api_user1.user["id"]}, "user1 看到了他人图片记录"
+    assert {r["user_id"] for r in vid1} <= {api_user1.user["id"]}, "user1 看到了他人视频记录"
+    assert {r["user_id"] for r in img2} <= {api_user2.user["id"]}, "user2 看到了他人图片记录"
+    assert {r["user_id"] for r in vid2} <= {api_user2.user["id"]}, "user2 看到了他人视频记录"
+    actual(f"user1 图片 {len(img1)} 条 / 视频 {len(vid1)} 条，user_id 集合={sorted({r['user_id'] for r in img1 + vid1})}；"
+           f"user2 图片 {len(img2)} 条 / 视频 {len(vid2)} 条，user_id 集合={sorted({r['user_id'] for r in img2 + vid2})}")
+
+
+
+# 11：视频检测任务全流程——提交任务、轮询状态、完成校验、结果字段与预览接口是否正常。（场景法）
+@pytest.mark.api
+@pytest.mark.case("TC-DET-11")
+def test_video_task_full_flow(api_user1, actual):
+    submitted = assert_ok(api_user1.detect_video(video_bytes(), "sample_clip.avi",
+                                                 model_key="student.pt", score_thresh=0.25))
+    task_id = submitted["id"]
+    assert submitted["status"] in ("queued", "running"), f"提交后状态异常：{submitted}"
+
+    final = None
+    deadline = time.time() + 180
+    seen = []
+    while time.time() < deadline:
+        final = assert_ok(api_user1.video_task(task_id))
+        seen.append(final["status"])
+        if final["status"] in ("finished", "failed"):
+            break
+        time.sleep(3)
+
+    assert final and final["status"] == "finished", f"任务未正常完成：{final}"
+    assert final["progress"] == 100, f"完成后进度应为 100：{final}"
+    result = final["result"]
+    assert result.get("frames_processed", 0) > 0, f"应处理到视频帧：{result}"
+    assert "class_counts" in result
+
+    preview = api_user1.video_preview(task_id)
+    assert preview.status_code == 200, f"预览接口异常：{dump(preview)}"
+    assert preview.headers.get("Content-Type", "").startswith("video/"), preview.headers
+    assert len(preview.content) > 0, "预览内容为空"
+    actual(f"任务 {task_id} 状态流转 {'->'.join(dict.fromkeys(seen))}，progress=100，"
+           f"frames_processed={result['frames_processed']}，class_counts={result['class_counts']}；"
+           f"预览 HTTP 200，{preview.headers.get('Content-Type')}，{len(preview.content)} 字节")
+
+
+# 12：user2访问user1的视频任务详情/预览是否被拒绝（403+code=4031）。（场景法）
+@pytest.mark.api
+@pytest.mark.case("TC-DET-12")
+def test_video_task_cross_user_denied(api_user1, api_user2, actual):
+    submitted = assert_ok(api_user1.detect_video(video_bytes(), "cross_user.avi",
+                                                 model_key="student.pt", score_thresh=0.25))
+    task_id = submitted["id"]
+    detail = api_user2.video_task(task_id)
+    preview = api_user2.video_preview(task_id)
+    b1 = assert_error(detail, http_status=403, code=4031)
+    b2 = assert_error(preview, http_status=403, code=4031)
+    actual(f"user2 查询 user1 的任务 {task_id}：详情 HTTP {detail.status_code}/code={b1['code']}，"
+           f"预览 HTTP {preview.status_code}/code={b2['code']}")
+
+# 13：实时监控会话生命周期——启动、查询状态、取帧、越权访问、停止后状态是否为 stopped。（场景法）
+@pytest.mark.api
+@pytest.mark.case("TC-DET-13")
+def test_realtime_session_lifecycle(api_user1, api_user2, actual):
+    started = assert_ok(api_user1.realtime_start(source="0", model_key="student.pt",
+                                                 score_thresh=0.25, realtime_fps=8))
+    session_id = started["id"]
+    assert started["status"] in ("queued", "running"), f"会话初始状态异常：{started}"
+
+    time.sleep(3)
+    status = assert_ok(api_user1.realtime_status(session_id))
+    assert status["id"] == session_id
+    assert status["status"] in ("queued", "running"), f"会话状态异常：{status}"
+
+    frame = api_user1.realtime_frame(session_id)
+    assert frame.status_code in (200, 204), f"取帧接口异常：{dump(frame)}"
+
+    denied = api_user2.realtime_status(session_id)
+    assert_error(denied, http_status=403, code=4031)
+
+    stopped = assert_ok(api_user1.realtime_stop(session_id))
+    assert stopped["status"] == "stopped", f"停止后状态应为 stopped：{stopped}"
+    again = assert_ok(api_user1.realtime_status(session_id))
+    assert again["status"] == "stopped"
+    actual(f"会话 {session_id} 启动成功（status={started['status']}），3 秒后 status={status['status']}、"
+           f"frames_processed={status['frames_processed']}；取帧 HTTP {frame.status_code}；"
+           f"user2 访问 HTTP {denied.status_code}；停止后 status={again['status']}")
