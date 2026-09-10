@@ -303,3 +303,111 @@ def test_model_select_default_value(ui_user1, actual):
     assert labels, "模型下拉框没有任何选项"
     assert selected, "模型下拉框默认没有选中任何选项（页面显示占位符）"
     assert selected in labels, f"默认选中项 {selected!r} 不在选项列表中 {labels}"
+
+
+# ==========================================================================
+# 三、单元测试用例（TC-DET-15 ~ TC-DET-17）
+# ==========================================================================
+def _load_backend():
+    """把后端源码目录加入 sys.path 并返回“检测模块”的被测对象；源码不可用时跳过单元用例。"""
+    if str(BACKEND_ROOT) not in sys.path:
+        sys.path.insert(0, str(BACKEND_ROOT))
+    try:
+        from app.api.detection import _parse_score_thresh
+        from app.services.detection_service import DetectionService
+    except Exception as exc:  # noqa: BLE001
+        pytest.skip(f"无法导入后端源码（{BACKEND_ROOT}）：{exc}")
+    return DetectionService, _parse_score_thresh
+
+
+
+# 15：DetectionService._apply_thresh的阈值过滤边界——等于阈值保留、低于阈值剔除、无score按0处理、空输入返回空列表。（边界值分析法）
+@pytest.mark.unit
+@pytest.mark.case("TC-DET-15")
+def test_apply_thresh_filter_boundary(actual):
+    """置信度阈值过滤：等于阈值保留、低于阈值剔除、缺省分数按 0 处理。
+
+    被测函数：DetectionService._apply_thresh（backend/app/services/detection_service.py:2660）
+    属于检测模块：图片/视频推理调用 _predict_* 时统一用它按 score_thresh 过滤检测结果。
+    """
+    DetectionService, _ = _load_backend()
+    detections = [
+        {"class_name": "Trash", "score": 0.90},
+        {"class_name": "Bio", "score": 0.25},
+        {"class_name": "Rov", "score": 0.2499},
+        {"class_name": "NoScore"},
+    ]
+
+    kept = DetectionService._apply_thresh(detections, 0.25)
+    names = [d["class_name"] for d in kept]
+    assert names == ["Trash", "Bio"], f"等于阈值的应保留、低于阈值的应剔除，实际 {names}"
+
+    assert DetectionService._apply_thresh(detections, 0.05) == detections[:3], \
+        "阈值取下限时应保留所有有分目标（缺省分数的目标按 0 处理被剔除）"
+    assert DetectionService._apply_thresh(detections, 0.99) == [], "阈值取上限时不应有目标通过"
+    assert DetectionService._apply_thresh([], 0.25) == [], "空输入应返回空列表"
+
+    actual(f"输入 4 个目标（0.90 / 0.25 / 0.2499 / 无 score）；阈值 0.25 保留 {names}，"
+           "阈值 0.05 保留 3 个，阈值 0.99 保留 0 个，空输入返回空列表")
+
+# 16：_parse_score_thresh 的阈值解析——合法值原样返回、越界值钳制到 [0.05, 0.99]、非法值回落默认值（含自定义 default）（边界值分析法）
+@pytest.mark.unit
+@pytest.mark.case("TC-DET-16")
+def test_parse_score_thresh_clamp(actual):
+    """阈值解析：合法值原样返回，越界值钳制到 [0.05, 0.99]，非法值回落默认值。
+
+    被测函数：_parse_score_thresh（backend/app/api/detection.py:61）
+    属于检测模块：/api/detection/image、/video、/realtime/start 三个检测接口
+    都用它解析页面“置信度拦截阈值”滑块的取值。
+    """
+    _, _parse_score_thresh = _load_backend()
+
+    accepted = {"0.05": 0.05, "0.25": 0.25, "0.99": 0.99}
+    for raw, expected in accepted.items():
+        value = _parse_score_thresh(raw)
+        assert value == pytest.approx(expected), f"{raw} 应解析为 {expected}，实际 {value}"
+
+    clamped = {"1": 0.99, "5": 0.99, "0": 0.05, "-1": 0.05}
+    for raw, expected in clamped.items():
+        value = _parse_score_thresh(raw)
+        assert value == pytest.approx(expected), f"越界值 {raw} 应钳制为 {expected}，实际 {value}"
+
+    for raw in (None, "", "abc", "0.5abc"):
+        value = _parse_score_thresh(raw)
+        assert value == pytest.approx(0.25), f"非法输入 {raw!r} 应回落默认值 0.25，实际 {value}"
+
+    assert _parse_score_thresh(None, default=0.4) == pytest.approx(0.4), "应支持自定义默认值"
+    assert _parse_score_thresh("abc", default=0.4) == pytest.approx(0.4), "非法值应回落自定义默认值"
+
+    actual("合法值 0.05/0.25/0.99 原样返回；越界 1/5 钳制为 0.99，0/-1 钳制为 0.05；"
+           "None、空串、'abc' 等回落默认 0.25（自定义默认值 0.4 亦生效）")
+
+# 17：DetectionService._infer_engine的引擎识别——按文件后缀与文件名关键字判定yolo/student/fasterrcnn/onnx，未知类型回落unknown。（等价类划分法）
+@pytest.mark.unit
+@pytest.mark.case("TC-DET-17")
+def test_infer_engine_by_model_file(actual):
+    """模型引擎识别：按文件后缀与文件名关键字判定引擎，未知类型回落 unknown。
+
+    被测函数：DetectionService._infer_engine（backend/app/services/detection_service.py:3220）
+    属于检测模块：list_models() 用它标注每个模型的引擎，是 GET /api/detection/models 的返回依据，
+    即检测页面“水域场景适配模型”下拉框的数据来源。
+    """
+    DetectionService, _ = _load_backend()
+
+    engine_cases = {
+        "yolov11x.pt": "yolo",
+        "yolo26n.PT": "yolo",
+        "student.pth": "student",
+        "faster_RCNN.pth": "fasterrcnn",
+        "mask_rcnn.pth": "fasterrcnn",
+        "model.onnx": "onnx",
+        "weights.h5": "unknown",
+        "noext": "unknown",
+    }
+    got_map = {}
+    for filename, expected in engine_cases.items():
+        got = DetectionService._infer_engine(Path(filename))
+        got_map[filename] = got
+        assert got == expected, f"{filename} 的引擎应为 {expected}，实际 {got}"
+
+    actual("引擎识别结果：" + "，".join(f"{k}->{v}" for k, v in got_map.items()))
