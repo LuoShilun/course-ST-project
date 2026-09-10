@@ -1,0 +1,6 @@
+# 海迅智检测试工程依赖（Python 3.12+）
+pytest>=9.0
+requests>=2.32
+selenium>=4.25
+openpyxl>=3.1
+Pillow>=10.4
