@@ -245,7 +245,7 @@ def test_creating_detecting_over_string():
 def test_creating_trash_not_bool():
     data = {
       "detected_type": "trash",
-      "confidenct": 0.5,
+      "confidence": 0.5,
       "is_trash":1
     }
     creating = True
