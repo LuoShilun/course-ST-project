@@ -1,0 +1,14 @@
+# python缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# pytest报告
+reports/
+*.xml
+*.json
+
+# 环境
+venv/
+.venv/
