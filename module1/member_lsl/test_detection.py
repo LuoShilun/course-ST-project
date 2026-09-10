@@ -16,9 +16,11 @@ from common.api_client import ApiClient, dump, raw_request
 from common.assertions import assert_error, assert_ok
 from common.assets import image_bytes, video_bytes
 from common.paths import BACKEND_ROOT
+from common.ui import Page
+
 
 # ==========================================================================
-# 一、接口自动化用例（TC-DET-01 ~ 06）
+# 一、接口自动化用例（TC-DET-01 ~ TC-DET-13）
 # ==========================================================================
 def _image_total(client) -> int:
     """/api/detection/image/records 最多返回 200 条，改用 /api/records 的 total 统计。"""
@@ -118,6 +120,7 @@ def test_detect_image_record_consistency(api_user1, actual):
     actual(f"记录数 {before}->{after}；检测到 {len(detections)} 个目标（垃圾 {len(trash)} 个），"
            f"落库 detected_type={rec['detected_type']}、confidence={rec['confidence']}、is_trash={rec['is_trash']}")
 
+
 # 07：传入非法 model_key 时，接口是否应返回错误而非静默降级。（错误推测法）
 @pytest.mark.api
 @pytest.mark.defect
@@ -158,6 +161,7 @@ def test_admin_invalid_robot_id(api_admin, actual):
     actual(dump(resp, 200))
     assert resp.status_code < 500, f"参数错误不应返回 5xx，实际 {dump(resp)}"
     assert_error(resp, http_status=400)
+
 
 # 10：检测历史记录是否按用户隔离，user1/user2 各自只能看到自己的图片与视频记录。（场景法）
 @pytest.mark.api
@@ -251,3 +255,51 @@ def test_realtime_session_lifecycle(api_user1, api_user2, actual):
     actual(f"会话 {session_id} 启动成功（status={started['status']}），3 秒后 status={status['status']}、"
            f"frames_processed={status['frames_processed']}；取帧 HTTP {frame.status_code}；"
            f"user2 访问 HTTP {denied.status_code}；停止后 status={again['status']}")
+
+
+# ==========================================================================
+# 二、浏览器 UI 自动化用例（TC-DET-14）
+# ==========================================================================
+def _open_models_dropdown(page: Page) -> list[str]:
+    """展开模型下拉框并读取全部选项文案。"""
+    select = page.wait_clickable(By.CSS_SELECTOR, ".config-card .el-select__wrapper")
+    select.click()
+    time.sleep(1.2)
+    options = page.driver.find_elements(By.CSS_SELECTOR, ".el-select-dropdown__item")
+    labels = [el.text.strip() for el in options if el.text.strip()]
+    page.driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
+    time.sleep(0.5)
+    return labels
+
+
+def _selected_text(page: Page) -> str:
+    for selector in (".config-card .el-select__selected-item", ".config-card .el-select__placeholder"):
+        els = page.driver.find_elements(By.CSS_SELECTOR, selector)
+        for el in els:
+            if el.is_displayed() and el.text.strip():
+                return el.text.strip()
+    return ""
+
+# 14：/detect 页面“水域场景适配模型”下拉框能否正确渲染默认选中项，且选中项必须出现在选项列表中。（等价类划分）
+@pytest.mark.ui
+@pytest.mark.defect
+@pytest.mark.case("TC-DET-14")
+@pytest.mark.xfail(strict=True, reason="BUG-06：默认 model_key 为 mock-default，不在选项列表中，下拉框显示为空")
+def test_model_select_default_value(ui_user1, actual):
+    page = Page(ui_user1)
+    page.open("/detect")
+    page.wait_visible(By.CSS_SELECTOR, ".config-card .el-select__wrapper")
+
+    labels = _open_models_dropdown(page)
+    selected = _selected_text(page)
+    hint = ""
+    hints = ui_user1.find_elements(By.CSS_SELECTOR, ".config-card .form-hint")
+    if hints:
+        hint = hints[0].text.strip()
+    page.screenshot("TC-DET-14-model-select")
+
+    actual(f"下拉框选项 {len(labels)} 个：{'、'.join(labels)}；默认选中项显示为“{selected or '(空)'}”；"
+           f"引擎档案提示：{hint or '(空)'}")
+    assert labels, "模型下拉框没有任何选项"
+    assert selected, "模型下拉框默认没有选中任何选项（页面显示占位符）"
+    assert selected in labels, f"默认选中项 {selected!r} 不在选项列表中 {labels}"
