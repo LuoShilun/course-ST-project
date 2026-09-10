@@ -239,7 +239,7 @@ def test_creating_detecting_over_string():
         _validate_record_fields(data, creating=True)
 
 
-# is_trash 传入非布尔值
+# is_trash 传入非布尔值,类型错误
 @pytest.mark.unit
 @pytest.mark.case("TC-REC-14")
 def test_creating_trash_not_bool():
@@ -254,6 +254,9 @@ def test_creating_trash_not_bool():
 
 
 
+# ------------------------------以下测试样例针对更新场景设计测试样例（场景法）
+
+# 更新但传入数据为空,应报错
 @pytest.mark.unit
 @pytest.mark.case("TC-REC-15")
 def test_updating_none():
@@ -262,3 +265,78 @@ def test_updating_none():
     creating = False
     with pytest.raises(ValueError, match="更新时传入data不能为空"):
         _validate_record_fields(data, creating=False)
+
+# 更新传入数据有效
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-16")
+def test_updating_valid():
+    data = {
+        "detected_type": "trash",
+        "confidence": 0.5,
+        "is_trash": True
+    }
+
+    result = _validate_record_fields(data,creating= False)
+    
+    assert result ==  {
+        "detected_type": "trash",
+        "confidence": 0.5,
+        "is_trash": True
+    }
+
+# 分别检测三个传入字段单独缺失,应均能正常通过验证
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-17-1")
+def test_update_record_partial_1():
+    data = {"confidence": 0.5, "is_trash": True}
+    result = _validate_record_fields(data, creating=False)
+    assert result == data, "场景1：confidence+is_trash 校验失败"
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-17-2")
+def test_update_record_partial_2():
+    data = {"detected_type": "trash", "is_trash": True}
+    result = _validate_record_fields(data, creating=False)
+    assert result == data, "场景2：detected_type+is_trash 校验失败"
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-17-3")
+def test_update_record_partial_3():
+    data = {"detected_type": "trash", "confidence": 0.5}
+    result = _validate_record_fields(data, creating=False)
+    assert result == data, "场景3：detected_type+confidence 校验失败"
+
+
+# 创建记录时，传入字段存在缺失
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-18-1")
+def test_create_record_missing_detected_type():
+    data = {"confidence": 0.5, "is_trash": True}
+    with pytest.raises(ValueError) as exc_info:
+        _validate_record_fields(data, creating=True)
+    assert "detected_type 必须为 1 到 50 个字符的非空字符串" in str(exc_info.value), "场景1：新建缺失detected_type，未按预期报错"
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-18-2")
+def test_create_record_missing_confidence():
+  
+    data = {"detected_type": "trash", "is_trash": True}
+    with pytest.raises(ValueError) as exc_info:
+        _validate_record_fields(data, creating=True)
+    assert "confidence 为创建记录必填字段，不可缺失" in str(exc_info.value), "场景2：新建缺失confidence，未按预期报错，存在缺陷"
+
+@pytest.mark.unit
+@pytest.mark.case("TC-REC-18-3")
+def test_create_record_missing_is_trash():
+  
+    data = {"detected_type": "trash", "confidence": 0.5}
+    with pytest.raises(ValueError) as exc_info:
+        _validate_record_fields(data, creating=True)
+    assert "is_trash 为创建记录必填字段，不可缺失" in str(exc_info.value), "场景3：新建缺失is_trash，未按预期报错，存在缺陷"
+
+
+
+
+
