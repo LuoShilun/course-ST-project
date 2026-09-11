@@ -4,10 +4,7 @@ __pycache__/
 *.pyo
 *.pyd
 
-# pytest报告
-reports/
-*.xml
-*.json
+
 
 # 环境
 venv/

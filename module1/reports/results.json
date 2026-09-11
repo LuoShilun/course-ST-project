@@ -1,132 +1,163 @@
 {
-  "run_started_at": "2026-09-10T10:15:37",
-  "run_finished_at": "2026-09-10T10:16:03",
+  "run_started_at": "2026-09-11T08:36:18",
+  "run_finished_at": "2026-09-11T08:36:20",
   "base_url": "http://127.0.0.1:5000",
   "web_url": "http://127.0.0.1:5173",
-  "case_count": 17,
+  "case_count": 22,
   "results": [
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_models_list_ok",
-      "case_id": "TC-DET-01",
-      "duration": 0.033,
+      "nodeid": "member_xyf/test_records.py::test_creating_valid",
+      "case_id": "TC-REC-01",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 200，返回 4 个模型：faster_RCNN.pth, student.pt, yolo26n.pt, yolov11x.pt；inference_enabled=True，default_model_key=mock-default"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detection_requires_token",
-      "case_id": "TC-DET-02",
-      "duration": 0.064,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_less_than_zero",
+      "case_id": "TC-REC-02",
+      "duration": 0.01,
       "status": "passed",
-      "actual": "GET /models -> HTTP 401；POST /image -> HTTP 401，均未返回业务数据"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_without_file",
-      "case_id": "TC-DET-03",
-      "duration": 0.018,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_equal_zero",
+      "case_id": "TC-REC-03",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 400，code=4001，message=请上传文件"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_empty_filename",
-      "case_id": "TC-DET-04",
-      "duration": 0.09,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_equal_one",
+      "case_id": "TC-REC-04",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 400，code=4002，message=文件名不能为空"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_not_an_image",
-      "case_id": "TC-DET-05",
-      "duration": 0.058,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_greater_than_one",
+      "case_id": "TC-REC-05",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 400，code=4003，message=请上传内容完整且有效的图片文件；记录数保持 462 条不变"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_truncated_jpeg",
-      "case_id": "TC-DET-06",
-      "duration": 0.05,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_str_number_valid",
+      "case_id": "TC-REC-06",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 400，code=4003，message=请上传内容完整且有效的图片文件；记录数保持 462 条不变"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_success_and_persist",
-      "case_id": "TC-DET-07",
-      "duration": 0.315,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_str_non_number_invalid",
+      "case_id": "TC-REC-07",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "HTTP 200，检测到 2 个目标，summary={'total': 2, 'trash_count': 1}；记录数 462->463，最新记录 id=751、user_id=2"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_detect_image_record_consistency",
-      "case_id": "TC-DET-08",
-      "duration": 0.186,
+      "nodeid": "member_xyf/test_records.py::test_creating_confidence_bool_invalid",
+      "case_id": "TC-REC-08",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "记录数 463->464；检测到 2 个目标（垃圾 1 个），落库 detected_type=Trash、confidence=0.925657、is_trash=True"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_score_thresh_boundary",
-      "case_id": "TC-DET-09",
-      "duration": 0.966,
+      "nodeid": "member_xyf/test_records.py::test_creating_detecting_not_exist",
+      "case_id": "TC-REC-09",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "各阈值命中目标数：0.05->2，0.25->2，0.95->0，0.99->0，1->0，0->2，-1->2，abc->2，空->2；越界值 -1 与 1 分别等价于下界 0.05 与上界 0.99"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_invalid_model_key_rejected",
-      "case_id": "TC-DET-10",
-      "duration": 2.125,
-      "status": "xfailed",
-      "actual": "HTTP 200，model_status=loaded，detections=2，落库 detected_type=trash、model_key=not-exist.pt；断言失败：非法模型键应被拒绝，实际 HTTP 200 {\"code\": 0, \"data\": {\"annotated_image\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCAGgAaADASIAAhEBAxEB assert 200 >= 400 + where 200 = <Response [200]>.status_code",
-      "reason": "BUG-04：非法 model_key 被静默降级，未返回错误"
-    },
-    {
-      "nodeid": "member_lsl/test_detection_api.py::test_chinese_filename_kept",
-      "case_id": "TC-DET-11",
-      "duration": 0.079,
-      "status": "xfailed",
-      "actual": "落库 media_path=E:\\MyProjectWorkSpace\\underwater_project\\web_system\\web_system\\backend\\uploads\\images\\1789006542175_png；断言失败：落盘文件名应保留中文原名与扩展名，实际 E:\\MyProjectWorkSpace\\underwater_project\\web_system\\web_system\\backend\\uploads\\images\\1789006542175_png assert ('\\u6c34\\u4e0b\\u5783\\u573e\\u6837\\u672c' in 'E:\\\\MyProjectWorkSpace\\\\underwater_project\\\\web_system\\\\web_system\\\\backend\\\\uploads\\\\images\\\\1789006542175_png')",
-      "reason": "BUG-05：中文文件名被 secure_filename 破坏，落盘名丢失原名与扩展名"
-    },
-    {
-      "nodeid": "member_lsl/test_detection_api.py::test_admin_invalid_robot_id",
-      "case_id": "TC-DET-12",
-      "duration": 0.065,
-      "status": "xfailed",
-      "actual": "HTTP 500 <!doctype html> <html lang=en> <head> <title>ValueError: invalid literal for int() with base 10: &#39;abc&#39; // Werkzeug Debugger</title> <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resou；断言失败：参数错误不应返回 5xx，实际 HTTP 500 <!doctype html> <html lang=en> <head> <title>ValueError: invalid literal for int() with base 10: &#39;abc&#39; // Werkzeug Debugger</title> <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=style.css\"> <link rel=\"shortcut icon\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=conso assert 500 < 500 + where 500 = <Response [500]>.status_code",
-      "reason": "BUG-01：robot_id 非整数导致未捕获异常，返回 500 调试页"
-    },
-    {
-      "nodeid": "member_lsl/test_detection_api.py::test_detection_history_isolation",
-      "case_id": "TC-DET-13",
-      "duration": 0.164,
+      "nodeid": "member_xyf/test_records.py::test_creating_detecting_empty_string",
+      "case_id": "TC-REC-10",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "user1 图片 200 条 / 视频 92 条，user_id 集合=[2]；user2 图片 10 条 / 视频 0 条，user_id 集合=[5]"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_video_task_full_flow",
-      "case_id": "TC-DET-14",
-      "duration": 6.482,
+      "nodeid": "member_xyf/test_records.py::test_creating_detecting_min_string",
+      "case_id": "TC-REC-11",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "任务 372d5775-3ca1-4076-a380-f4320f26aad8 状态流转 running->finished，progress=100，frames_processed=24，class_counts={}；预览 HTTP 200，video/mp4，4860 字节"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_video_task_cross_user_denied",
-      "case_id": "TC-DET-15",
-      "duration": 0.119,
+      "nodeid": "member_xyf/test_records.py::test_creating_detecting_max_string",
+      "case_id": "TC-REC-12",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "user2 查询 user1 的任务 a8ce660e-3ebc-4242-9b29-165dcd9e05d7：详情 HTTP 403/code=4031，预览 HTTP 403/code=4031"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_api.py::test_realtime_session_lifecycle",
-      "case_id": "TC-DET-16",
-      "duration": 3.098,
+      "nodeid": "member_xyf/test_records.py::test_creating_detecting_over_string",
+      "case_id": "TC-REC-13",
+      "duration": 0.0,
       "status": "passed",
-      "actual": "会话 b962c39b6bea4a70891a5f44242b7477 启动成功（status=running），3 秒后 status=running、frames_processed=0；取帧 HTTP 204；user2 访问 HTTP 403；停止后 status=stopped"
+      "actual": "实际结果与预期一致"
     },
     {
-      "nodeid": "member_lsl/test_detection_ui.py::test_model_select_default_value",
-      "case_id": "TC-DET-17",
-      "duration": 2.912,
-      "status": "xfailed",
-      "actual": "下拉框选项 4 个：faster_RCNN fasterrcnn、student yolo、yolo26n yolo、yolov11x yolo；默认选中项显示为“mock-default”；引擎档案提示：引擎档案: 未选择；断言失败：默认选中项 'mock-default' 不在选项列表中 ['faster_RCNN\\nfasterrcnn', 'student\\nyolo', 'yolo26n\\nyolo', 'yolov11x\\nyolo'] assert 'mock-default' in ['faster_RCNN\\nfasterrcnn', 'student\\nyolo', 'yolo26n\\nyolo', 'yolov11x\\nyolo']",
-      "reason": "BUG-06：默认 model_key 为 mock-default，不在选项列表中，下拉框显示为空"
+      "nodeid": "member_xyf/test_records.py::test_creating_trash_not_bool",
+      "case_id": "TC-REC-14",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_updating_none",
+      "case_id": "TC-REC-15",
+      "duration": 0.0,
+      "status": "failed",
+      "actual": "DID NOT RAISE <class 'ValueError'>"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_updating_valid",
+      "case_id": "TC-REC-16",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_update_record_partial_1",
+      "case_id": "TC-REC-17-1",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_update_record_partial_2",
+      "case_id": "TC-REC-17-2",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_update_record_partial_3",
+      "case_id": "TC-REC-17-3",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_create_record_missing_detected_type",
+      "case_id": "TC-REC-18-1",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_create_record_missing_confidence",
+      "case_id": "TC-REC-18-2",
+      "duration": 0.0,
+      "status": "failed",
+      "actual": "DID NOT RAISE <class 'ValueError'>"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_create_record_missing_is_trash",
+      "case_id": "TC-REC-18-3",
+      "duration": 0.0,
+      "status": "failed",
+      "actual": "DID NOT RAISE <class 'ValueError'>"
     }
   ]
 }
