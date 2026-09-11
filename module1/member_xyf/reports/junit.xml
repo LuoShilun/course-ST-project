@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="22" time="1.794" timestamp="2026-09-11T08:36:18.908098" hostname="LAPTOP-SGJNL0UC"><testcase classname="member_xyf.test_records" name="test_creating_valid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_less_than_zero" time="0.011" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_equal_zero" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_equal_one" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_greater_than_one" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_str_number_valid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_str_non_number_invalid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_bool_invalid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_not_exist" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_empty_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_min_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_max_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_over_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_trash_not_bool" time="0.001" /><testcase classname="member_xyf.test_records" name="test_updating_none" time="0.001"><failure message="Failed: DID NOT RAISE &lt;class 'ValueError'&gt;">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-15")
+    def test_updating_none():
+        data = {
+        }
+        creating = False
+&gt;       with pytest.raises(ValueError, match="更新时传入data不能为空"):
+E       Failed: DID NOT RAISE &lt;class 'ValueError'&gt;
+
+test_records.py:266: Failed</failure></testcase><testcase classname="member_xyf.test_records" name="test_updating_valid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_1" time="0.001" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_2" time="0.001" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_3" time="0.001" /><testcase classname="member_xyf.test_records" name="test_create_record_missing_detected_type" time="0.001" /><testcase classname="member_xyf.test_records" name="test_create_record_missing_confidence" time="0.001"><failure message="Failed: DID NOT RAISE &lt;class 'ValueError'&gt;">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-18-2")
+    def test_create_record_missing_confidence():
+    
+        data = {"detected_type": "trash", "is_trash": True}
+&gt;       with pytest.raises(ValueError) as exc_info:
+E       Failed: DID NOT RAISE &lt;class 'ValueError'&gt;
+
+test_records.py:326: Failed</failure></testcase><testcase classname="member_xyf.test_records" name="test_create_record_missing_is_trash" time="0.001"><failure message="Failed: DID NOT RAISE &lt;class 'ValueError'&gt;">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-18-3")
+    def test_create_record_missing_is_trash():
+    
+        data = {"detected_type": "trash", "confidence": 0.5}
+&gt;       with pytest.raises(ValueError) as exc_info:
+E       Failed: DID NOT RAISE &lt;class 'ValueError'&gt;
+
+test_records.py:335: Failed</failure></testcase></testsuite></testsuites>

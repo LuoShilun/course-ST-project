@@ -10,21 +10,21 @@
       "case_id": "TC-DET-01",
       "duration": 0.024,
       "status": "passed",
-      "actual": "HTTP 200，返回 4 个模型：faster_RCNN.pth, student.pt, yolo26n.pt, yolov11x.pt；inference_enabled=True，default_model_key=mock-default"
+      "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_lsl/test_detection.py::test_detection_requires_token",
       "case_id": "TC-DET-02",
       "duration": 0.014,
       "status": "passed",
-      "actual": "GET /models -> HTTP 401；POST /image -> HTTP 401，均未返回业务数据"
+      "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_lsl/test_detection.py::test_detect_image_empty_filename",
       "case_id": "TC-DET-03",
       "duration": 0.068,
       "status": "passed",
-      "actual": "HTTP 400，code=4002，message=文件名不能为空"
+      "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_lsl/test_detection.py::test_detect_image_not_an_image",

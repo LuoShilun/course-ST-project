@@ -1,0 +1,24 @@
+# 海迅智检测试工程 · 模块二（方案2「AI测」）依赖（Python 3.12+）
+# 与模块一保持一致；AI 辅助部分如需调用大模型 SDK，请在下方按实际选型补充。
+pytest>=9.0
+requests>=2.32
+selenium>=4.25
+openpyxl>=3.1
+Pillow>=10.4
+
+# 以下为「直接 import 后端被测代码」的单元用例所需：
+
+flask>=3.0
+flask-cors>=4.0
+flask-jwt-extended>=4.6
+flask-sqlalchemy>=3.1
+python-dotenv>=1.0
+SQLAlchemy>=2.0
+numpy>=1.26
+
+# --- 模块二（方案2「AI测」）选配：AI 辅助测试所需 ---
+# 说明：本地项目的 AI 集成在 utils 层（如 ChatDocUtil/OcrUtil），
+# 若"AI测"仅复用被测系统自带的 AI 能力，则无需额外依赖；
+# 若需用独立 LLM 生成用例/断言，再按选型补充，例如：
+# openai>=1.40
+# anthropic>=0.34
