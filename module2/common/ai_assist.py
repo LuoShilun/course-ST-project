@@ -1,59 +1,144 @@
 # -*- coding: utf-8 -*-
-"""模块二（方案2「AI测」）· AI 辅助测试的接入点（骨架 / 待实现）。
+"""模块二（方案2「AI测」）· 检测记录模块的 AI 辅助测试数据与用例目录。
 
-模块一禁用 AI 生成用例；模块二（AI 融合）允许并鼓励用 AI 辅助测试。
-本文件是"AI 如何参与测试"的唯一接入点，保持与具体大模型解耦，供两位成员共用。
+被测对象（唯一）：``web_system/backend/app/api/records.py`` 的
+``_validate_record_fields(data, *, creating)``。
 
-典型的"AI 测"用法（三选一或组合，按最终方案取舍）：
-  A. 用例生成：把被测函数签名/接口文档交给 LLM，批量产出等价类、边界值、场景用例草稿，
-     人工审校后落到各 member_*/test_*.py。→ 用 ``generate_cases()``。
-  B. 断言/期望生成：让 LLM 依据接口契约推断"合理期望"，与真实响应比对，检出语义级缺陷。
-     → 用 ``infer_expectation()``。
-  C. 缺陷聚类/失败归因：把 pytest 失败输出交给 LLM 归类、给出疑似根因与修复建议。
-     → 用 ``analyze_failures()``。
+AI 在模块二中承担"批量生成/枚举测试数据、产出用例草稿"的角色；本文件集中存放：
 
-设计约束：
-  * 本文件不硬编码任何 API Key / 模型厂商；密钥一律走环境变量，缺失时抛
-    ``AIAssistUnavailable``，由调用方决定 skip 还是失败，避免 CI 无密钥即崩。
-  * 任何 AI 产物都应视为"待人工审校的草稿"，不得直接作为判定被测系统正确性的唯一依据。
+  1. **生成的测试数据**（按侧重分组，供 ``member_xyf/test_records.py`` 逐条断言具体预期）；
+  2. **用例目录**（``CASE_CATALOG`` / ``generate_cases``，供报告附录与 ``ai_cases.json``）。
+
+准则：预期**只依据源码与该函数的字段契约推断**，不引入契约之外的假设；
+数据与用例均为离线、确定性的，不依赖网络或大模型密钥。
 """
 from __future__ import annotations
 
-import os
 from typing import Any
+
+# 被测对象与其字段契约（用例预期的唯一依据）
+TARGET = "app.api.records._validate_record_fields"
+FIELD_CONTRACT: dict[str, str] = {
+    "detected_type": "字符串，strip() 后长度必须落在 [1, 50]",
+    "confidence": "数值（非 bool），必须有限且落在 [0.0, 1.0]；数字字符串可被接受",
+    "is_trash": "必须是 JSON 布尔值 true / false（Python bool）",
+}
 
 
 class AIAssistUnavailable(RuntimeError):
-    """未配置可用的 AI 后端（缺少 SDK 或密钥）时抛出。"""
+    """未配置可用的（真实）AI 后端时抛出。本地实现不使用它。"""
 
 
-# --- 后端选择：按实际选型实现其中一个即可 -------------------------------------
-# 候选一：复用被测系统自带的 AI 能力（web_system/backend 的 assistant_service/ChatDocUtil）
-# 候选二：外部 LLM，如 OPENAI_API_KEY / DASHSCOPE_API_KEY / SPARK_* 等环境变量
-AI_BACKEND = os.getenv("MODULE2_AI_BACKEND", "")   # e.g. "system" | "openai" | "dashscope"
+# --------------------------------------------------------------------------
+# 一、生成的测试数据（按侧重分组）
+# --------------------------------------------------------------------------
+#: detected_type 类型检查：非字符串一律应拒绝
+NON_STRING_DETECTED_TYPES: list[Any] = [123, 0, None, [], {}, ("t",), b"trash", 4.5]
+
+#: detected_type 空白检查：strip() 后为空，应拒绝
+BLANK_DETECTED_TYPES: list[str] = ["", "   ", "\t", "\n", "  \t\n ", "\r\n"]
+
+#: detected_type 非 ASCII 正常值：按"字符数"计长，应通过并原样返回
+NON_ASCII_DETECTED_TYPES: list[str] = ["水下垃圾", "垃圾" * 16, "Trash·垃圾"]
+
+#: confidence 数字字符串：应被 float() 转换为对应数值
+NUMERIC_STRING_CONFIDENCE: list[str] = ["0.5", "1e0", " 0.5 ", ".5", "0.50"]
+
+#: confidence 非数字字符串：无法转换，应拒绝
+NON_NUMERIC_STRING_CONFIDENCE: list[str] = ["abc", "", "0.5.6", "0,5", "½"]
+
+#: confidence 整数（数值）应通过；布尔应拒绝（bool 虽可转 1.0/0.0）
+VALID_INT_CONFIDENCE: list[int] = [0, 1]
+REJECTED_BOOL_CONFIDENCE: list[bool] = [True, False]
+
+#: confidence 越界值：应拒绝
+OUT_OF_RANGE_CONFIDENCE: list[Any] = [-0.1, 1.1, -1.0, 2.0]
+
+#: is_trash 非布尔：应拒绝
+IS_TRASH_NON_BOOL: list[Any] = [1, 0, "true", "false", None, [], {}]
+
+
+# --------------------------------------------------------------------------
+# 二、用例目录（15 条，每条一个侧重）
+# --------------------------------------------------------------------------
+CASE_CATALOG: list[dict[str, str]] = [
+    {"case_id": "TC2-REC-01", "title": "detected_type 类型检查：非字符串一律拒绝",
+     "focus": "detected_type 必须为 str"},
+    {"case_id": "TC2-REC-02", "title": "detected_type 纯空白串应拒绝",
+     "focus": "strip 后长度为 0"},
+    {"case_id": "TC2-REC-03", "title": "detected_type 首尾空白应被去除后写回",
+     "focus": "返回值 = value.strip()"},
+    {"case_id": "TC2-REC-04", "title": "detected_type 长度上界：50 通过 / 51 拒绝",
+     "focus": "len <= 50"},
+    {"case_id": "TC2-REC-05", "title": "detected_type 长度下界：1 通过 / 0 拒绝",
+     "focus": "len >= 1"},
+    {"case_id": "TC2-REC-06", "title": "detected_type 非 ASCII：按字符计长且内容原样返回",
+     "focus": "多字节字符"},
+    {"case_id": "TC2-REC-07", "title": "confidence 数字字符串被转换为对应数值",
+     "focus": "float() 转换"},
+    {"case_id": "TC2-REC-08", "title": "confidence 非数字字符串应拒绝",
+     "focus": "转换失败分支"},
+    {"case_id": "TC2-REC-09", "title": "confidence 整数 0/1 通过、布尔 True/False 拒绝",
+     "focus": "int 与 bool 的分界"},
+    {"case_id": "TC2-REC-10", "title": "confidence 越界值（-0.1 / 1.1 / -1 / 2）应拒绝",
+     "focus": "区间 [0, 1]"},
+    {"case_id": "TC2-REC-11", "title": "confidence 返回类型恒为 float",
+     "focus": "返回类型契约"},
+    {"case_id": "TC2-REC-12", "title": "is_trash 非布尔（1/0/\"true\"/None/[]）应拒绝",
+     "focus": "严格 bool"},
+    {"case_id": "TC2-REC-13", "title": "is_trash 合法 True/False 通过并原样返回",
+     "focus": "布尔往返"},
+    {"case_id": "TC2-REC-14", "title": "update 模式同样校验传入字段（非法值拒绝）",
+     "focus": "update 也执行字段校验"},
+    {"case_id": "TC2-REC-15", "title": "update 模式只回传传入的字段",
+     "focus": "create 与 update 的字段范围差异"},
+]
+
+
+def _jsonable(values: list[Any]) -> list[Any]:
+    """把样本值转为 JSON 可序列化形式（bytes/元组等非原始类型用 repr 表示）。"""
+    out: list[Any] = []
+    for value in values:
+        if value is None or isinstance(value, (str, int, float, bool)):
+            out.append(value)
+        elif isinstance(value, (list, tuple)):
+            out.append(list(value))
+        elif isinstance(value, dict):
+            out.append(dict(value))
+        else:
+            out.append(repr(value))
+    return out
+
+
+def generate_cases(target: str = "records") -> dict[str, Any]:
+    """产出用例目录 + 生成的测试数据样本（供报告附录与 ai_cases.json）。"""
+    return {
+        "generated_by": "common/ai_assist.py::generate_cases",
+        "target": TARGET if target == "records" else target,
+        "field_contract": FIELD_CONTRACT,
+        "case_count": len(CASE_CATALOG),
+        "cases": [dict(c) for c in CASE_CATALOG],
+        "sample_data": {
+            "non_string_detected_types": _jsonable(NON_STRING_DETECTED_TYPES),
+            "blank_detected_types": _jsonable(BLANK_DETECTED_TYPES),
+            "non_ascii_detected_types": _jsonable(NON_ASCII_DETECTED_TYPES),
+            "numeric_string_confidence": _jsonable(NUMERIC_STRING_CONFIDENCE),
+            "non_numeric_string_confidence": _jsonable(NON_NUMERIC_STRING_CONFIDENCE),
+            "valid_int_confidence": _jsonable(VALID_INT_CONFIDENCE),
+            "rejected_bool_confidence": _jsonable(REJECTED_BOOL_CONFIDENCE),
+            "out_of_range_confidence": _jsonable(OUT_OF_RANGE_CONFIDENCE),
+            "is_trash_non_bool": _jsonable(IS_TRASH_NON_BOOL),
+        },
+    }
 
 
 def _client() -> Any:
-    raise AIAssistUnavailable(
-        "尚未配置 AI 后端：请在 common/ai_assist.py 中按选定方案实现 _client()，"
-        "并通过环境变量注入密钥（不要把 Key 写进仓库）。"
-    )
+    """可选的真实 LLM 客户端接入点（默认关闭）。
 
-
-def generate_cases(target: str, *, method: str = "boundary", n: int = 10) -> list[dict[str, Any]]:
-    """[待实现] 依据被测对象描述生成用例草稿。
-
-    返回形如 ``[{"case_id": "TC2-DET-01", "title": ..., "input": ..., "expected": ...}, ...]``。
-    产物需人工审校后再固化为 member_*/test_*.py 中的真实用例。
+    如需让 LLM 真正参与生成：设置 ``MODULE2_AI_BACKEND`` 并注入对应密钥的环境变量，
+    在这里按厂商 SDK 实现即可。密钥一律走环境变量，不要写进仓库。
     """
-    raise AIAssistUnavailable("generate_cases() 待实现，见本文件模块说明。")
-
-
-def infer_expectation(interface: str, request: dict[str, Any]) -> dict[str, Any]:
-    """[待实现] 让 LLM 依据接口契约推断该请求的"合理期望响应"，用于语义级断言。"""
-    raise AIAssistUnavailable("infer_expectation() 待实现，见本文件模块说明。")
-
-
-def analyze_failures(pytest_output: str) -> str:
-    """[待实现] 对 pytest 失败输出做归因分析，返回疑似根因与修复建议文本。"""
-    raise AIAssistUnavailable("analyze_failures() 待实现，见本文件模块说明。")
+    raise AIAssistUnavailable(
+        "未配置真实 AI 后端（MODULE2_AI_BACKEND 为空）；本模块默认走离线实现，"
+        "无需 LLM 即可运行。"
+    )
