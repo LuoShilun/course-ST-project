@@ -1,10 +1,133 @@
 {
-  "run_started_at": "2026-09-11T08:36:18",
-  "run_finished_at": "2026-09-11T08:36:20",
+  "run_started_at": "2026-09-10T20:38:02",
+  "run_finished_at": "2026-09-10T20:38:35",
   "base_url": "http://127.0.0.1:5000",
   "web_url": "http://127.0.0.1:5173",
-  "case_count": 22,
+  "case_count": 39,
   "results": [
+    {
+      "nodeid": "member_lsl/test_detection.py::test_models_list_ok",
+      "case_id": "TC-DET-01",
+      "duration": 0.024,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detection_requires_token",
+      "case_id": "TC-DET-02",
+      "duration": 0.014,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detect_image_empty_filename",
+      "case_id": "TC-DET-03",
+      "duration": 0.068,
+      "status": "passed",
+      "actual": "实际结果与预期一致"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detect_image_not_an_image",
+      "case_id": "TC-DET-04",
+      "duration": 0.092,
+      "status": "passed",
+      "actual": "HTTP 400，code=4003，message=请上传内容完整且有效的图片文件；记录数保持 516 条不变"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detect_image_success_and_persist",
+      "case_id": "TC-DET-05",
+      "duration": 0.43,
+      "status": "passed",
+      "actual": "HTTP 200，检测到 2 个目标，summary={'total': 2, 'trash_count': 1}；记录数 516->517，最新记录 id=888、user_id=2"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detect_image_record_consistency",
+      "case_id": "TC-DET-06",
+      "duration": 0.28,
+      "status": "passed",
+      "actual": "记录数 517->518；检测到 2 个目标（垃圾 1 个），落库 detected_type=Trash、confidence=0.925657、is_trash=True"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_invalid_model_key_rejected",
+      "case_id": "TC-DET-07",
+      "duration": 2.424,
+      "status": "xfailed",
+      "actual": "HTTP 200，model_status=loaded，detections=2，落库 detected_type=trash、model_key=not-exist.pt；断言失败：非法模型键应被拒绝，实际 HTTP 200 {\"code\": 0, \"data\": {\"annotated_image\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCAGgAaADASIAAhEBAxEB assert 200 >= 400 + where 200 = <Response [200]>.status_code",
+      "reason": "BUG-02：非法 model_key 被静默降级，未返回错误"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_chinese_filename_kept",
+      "case_id": "TC-DET-08",
+      "duration": 0.087,
+      "status": "xfailed",
+      "actual": "落库 media_path=E:\\MyProjectWorkSpace\\underwater_project\\web_system\\web_system\\backend\\uploads\\images\\1789043890008_png；断言失败：落盘文件名应保留中文原名与扩展名，实际 E:\\MyProjectWorkSpace\\underwater_project\\web_system\\web_system\\backend\\uploads\\images\\1789043890008_png assert ('水下垃圾样本' in 'E:\\\\MyProjectWorkSpace\\\\underwater_project\\\\web_system\\\\web_system\\\\backend\\\\uploads\\\\images\\\\1789043890008_png')",
+      "reason": "BUG-03：中文文件名被 secure_filename 破坏，落盘名丢失原名与扩展名"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_admin_invalid_robot_id",
+      "case_id": "TC-DET-09",
+      "duration": 0.051,
+      "status": "xfailed",
+      "actual": "HTTP 500 <!doctype html> <html lang=en> <head> <title>ValueError: invalid literal for int() with base 10: &#39;abc&#39; // Werkzeug Debugger</title> <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resou；断言失败：参数错误不应返回 5xx，实际 HTTP 500 <!doctype html> <html lang=en> <head> <title>ValueError: invalid literal for int() with base 10: &#39;abc&#39; // Werkzeug Debugger</title> <link rel=\"stylesheet\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=style.css\"> <link rel=\"shortcut icon\" href=\"?__debugger__=yes&amp;cmd=resource&amp;f=conso assert 500 < 500 + where 500 = <Response [500]>.status_code",
+      "reason": "BUG-01：robot_id 非整数导致未捕获异常，返回 500 调试页"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_detection_history_isolation",
+      "case_id": "TC-DET-10",
+      "duration": 0.187,
+      "status": "passed",
+      "actual": "user1 图片 200 条 / 视频 110 条，user_id 集合=[2]；user2 图片 10 条 / 视频 0 条，user_id 集合=[5]"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_video_task_full_flow",
+      "case_id": "TC-DET-11",
+      "duration": 9.541,
+      "status": "passed",
+      "actual": "任务 3d509fc5-91a6-4084-8b8a-8d1d0a348d18 状态流转 running->finished，progress=100，frames_processed=24，class_counts={}；预览 HTTP 200，video/mp4，4860 字节"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_video_task_cross_user_denied",
+      "case_id": "TC-DET-12",
+      "duration": 0.08,
+      "status": "passed",
+      "actual": "user2 查询 user1 的任务 8345a803-559f-4a24-961b-9197b3f2442e：详情 HTTP 403/code=4031，预览 HTTP 403/code=4031"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_realtime_session_lifecycle",
+      "case_id": "TC-DET-13",
+      "duration": 3.093,
+      "status": "passed",
+      "actual": "会话 5d02b85a0c8941b88879904137343dfc 启动成功（status=running），3 秒后 status=running、frames_processed=0；取帧 HTTP 204；user2 访问 HTTP 403；停止后 status=stopped"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_model_select_default_value",
+      "case_id": "TC-DET-14",
+      "duration": 3.98,
+      "status": "xfailed",
+      "actual": "下拉框选项 4 个：faster_RCNN fasterrcnn、student yolo、yolo26n yolo、yolov11x yolo；默认选中项显示为“mock-default”；引擎档案提示：引擎档案: 未选择；断言失败：默认选中项 'mock-default' 不在选项列表中 ['faster_RCNN\\nfasterrcnn', 'student\\nyolo', 'yolo26n\\nyolo', 'yolov11x\\nyolo'] assert 'mock-default' in ['faster_RCNN\\nfasterrcnn', 'student\\nyolo', 'yolo26n\\nyolo', 'yolov11x\\nyolo']",
+      "reason": "BUG-04：默认 model_key 为 mock-default，不在选项列表中，下拉框显示为空"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_apply_thresh_filter_boundary",
+      "case_id": "TC-DET-15",
+      "duration": 0.001,
+      "status": "passed",
+      "actual": "输入 4 个目标（0.90 / 0.25 / 0.2499 / 无 score）；阈值 0.25 保留 ['Trash', 'Bio']，阈值 0.05 保留 3 个，阈值 0.99 保留 0 个，空输入返回空列表"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_parse_score_thresh_clamp",
+      "case_id": "TC-DET-16",
+      "duration": 0.001,
+      "status": "passed",
+      "actual": "合法值 0.05/0.25/0.99 原样返回；越界 1/5 钳制为 0.99，0/-1 钳制为 0.05；None、空串、'abc' 等回落默认 0.25（自定义默认值 0.4 亦生效）"
+    },
+    {
+      "nodeid": "member_lsl/test_detection.py::test_infer_engine_by_model_file",
+      "case_id": "TC-DET-17",
+      "duration": 0.001,
+      "status": "passed",
+      "actual": "引擎识别结果：yolov11x.pt->yolo，yolo26n.PT->yolo，student.pth->student，faster_RCNN.pth->fasterrcnn，mask_rcnn.pth->fasterrcnn，model.onnx->onnx，weights.h5->unknown，noext->unknown"
+    },
     {
       "nodeid": "member_xyf/test_records.py::test_creating_valid",
       "case_id": "TC-REC-01",
@@ -15,7 +138,7 @@
     {
       "nodeid": "member_xyf/test_records.py::test_creating_confidence_less_than_zero",
       "case_id": "TC-REC-02",
-      "duration": 0.01,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
@@ -50,28 +173,28 @@
     {
       "nodeid": "member_xyf/test_records.py::test_creating_confidence_str_non_number_invalid",
       "case_id": "TC-REC-07",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_creating_confidence_bool_invalid",
       "case_id": "TC-REC-08",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_creating_detecting_not_exist",
       "case_id": "TC-REC-09",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_creating_detecting_empty_string",
       "case_id": "TC-REC-10",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
@@ -92,23 +215,23 @@
     {
       "nodeid": "member_xyf/test_records.py::test_creating_detecting_over_string",
       "case_id": "TC-REC-13",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_creating_trash_not_bool",
       "case_id": "TC-REC-14",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "passed",
       "actual": "实际结果与预期一致"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_updating_none",
       "case_id": "TC-REC-15",
-      "duration": 0.0,
+      "duration": 0.001,
       "status": "failed",
-      "actual": "DID NOT RAISE <class 'ValueError'>"
+      "actual": "DID NOT RAISE ValueError"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_updating_valid",
@@ -150,14 +273,14 @@
       "case_id": "TC-REC-18-2",
       "duration": 0.0,
       "status": "failed",
-      "actual": "DID NOT RAISE <class 'ValueError'>"
+      "actual": "DID NOT RAISE ValueError"
     },
     {
       "nodeid": "member_xyf/test_records.py::test_create_record_missing_is_trash",
       "case_id": "TC-REC-18-3",
       "duration": 0.0,
       "status": "failed",
-      "actual": "DID NOT RAISE <class 'ValueError'>"
+      "actual": "DID NOT RAISE ValueError"
     }
   ]
 }

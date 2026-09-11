@@ -1,8 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="1.855" timestamp="2026-09-11T08:35:53.538597" hostname="LAPTOP-SGJNL0UC"><testcase classname="" name="member_lsl.test_detection" time="0.000"><error message="collection failure">ImportError while importing test module 'C:\Users\Lenovo\Desktop\test\st1\course-ST-project\module1\member_lsl\test_detection.py'.
-Hint: make sure your test modules/packages have valid Python names.
-Traceback:
-D:\anaconda3\Lib\importlib\__init__.py:90: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-member_lsl\test_detection.py:12: in &lt;module&gt;
-    from selenium.webdriver.common.by import By
-E   ModuleNotFoundError: No module named 'selenium'</error></testcase></testsuite></testsuites>
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="4" tests="39" time="33.201" timestamp="2026-09-10T20:38:02.563687+08:00" hostname="LuoShilun"><testcase classname="member_lsl.test_detection" name="test_models_list_ok" time="0.230" /><testcase classname="member_lsl.test_detection" name="test_detection_requires_token" time="0.015" /><testcase classname="member_lsl.test_detection" name="test_detect_image_empty_filename" time="0.070" /><testcase classname="member_lsl.test_detection" name="test_detect_image_not_an_image" time="0.093" /><testcase classname="member_lsl.test_detection" name="test_detect_image_success_and_persist" time="0.432" /><testcase classname="member_lsl.test_detection" name="test_detect_image_record_consistency" time="0.282" /><testcase classname="member_lsl.test_detection" name="test_invalid_model_key_rejected" time="2.426"><skipped type="pytest.xfail" message="BUG-02：非法 model_key 被静默降级，未返回错误" /></testcase><testcase classname="member_lsl.test_detection" name="test_chinese_filename_kept" time="0.088"><skipped type="pytest.xfail" message="BUG-03：中文文件名被 secure_filename 破坏，落盘名丢失原名与扩展名" /></testcase><testcase classname="member_lsl.test_detection" name="test_admin_invalid_robot_id" time="0.200"><skipped type="pytest.xfail" message="BUG-01：robot_id 非整数导致未捕获异常，返回 500 调试页" /></testcase><testcase classname="member_lsl.test_detection" name="test_detection_history_isolation" time="0.387" /><testcase classname="member_lsl.test_detection" name="test_video_task_full_flow" time="9.543" /><testcase classname="member_lsl.test_detection" name="test_video_task_cross_user_denied" time="0.082" /><testcase classname="member_lsl.test_detection" name="test_realtime_session_lifecycle" time="3.094" /><testcase classname="member_lsl.test_detection" name="test_model_select_default_value" time="9.401"><skipped type="pytest.xfail" message="BUG-04：默认 model_key 为 mock-default，不在选项列表中，下拉框显示为空" /></testcase><testcase classname="member_lsl.test_detection" name="test_apply_thresh_filter_boundary" time="0.002" /><testcase classname="member_lsl.test_detection" name="test_parse_score_thresh_clamp" time="0.002" /><testcase classname="member_lsl.test_detection" name="test_infer_engine_by_model_file" time="0.002" /><testcase classname="member_xyf.test_records" name="test_creating_valid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_less_than_zero" time="0.002" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_equal_zero" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_equal_one" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_greater_than_one" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_str_number_valid" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_str_non_number_invalid" time="0.002" /><testcase classname="member_xyf.test_records" name="test_creating_confidence_bool_invalid" time="0.002" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_not_exist" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_empty_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_min_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_max_string" time="0.001" /><testcase classname="member_xyf.test_records" name="test_creating_detecting_over_string" time="0.002" /><testcase classname="member_xyf.test_records" name="test_creating_trash_not_bool" time="0.002" /><testcase classname="member_xyf.test_records" name="test_updating_none" time="0.002"><failure message="Failed: DID NOT RAISE ValueError">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-15")
+    def test_updating_none():
+        data = {
+        }
+        creating = False
+&gt;       with pytest.raises(ValueError, match="更新时传入data不能为空"):
+E       Failed: DID NOT RAISE ValueError
+
+member_xyf\test_records.py:266: Failed</failure></testcase><testcase classname="member_xyf.test_records" name="test_updating_valid" time="0.002" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_1" time="0.001" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_2" time="0.001" /><testcase classname="member_xyf.test_records" name="test_update_record_partial_3" time="0.001" /><testcase classname="member_xyf.test_records" name="test_create_record_missing_detected_type" time="0.001" /><testcase classname="member_xyf.test_records" name="test_create_record_missing_confidence" time="0.002"><failure message="Failed: DID NOT RAISE ValueError">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-18-2")
+    def test_create_record_missing_confidence():
+    
+        data = {"detected_type": "trash", "is_trash": True}
+&gt;       with pytest.raises(ValueError) as exc_info:
+E       Failed: DID NOT RAISE ValueError
+
+member_xyf\test_records.py:326: Failed</failure></testcase><testcase classname="member_xyf.test_records" name="test_create_record_missing_is_trash" time="2.751"><failure message="Failed: DID NOT RAISE ValueError">@pytest.mark.unit
+    @pytest.mark.case("TC-REC-18-3")
+    def test_create_record_missing_is_trash():
+    
+        data = {"detected_type": "trash", "confidence": 0.5}
+&gt;       with pytest.raises(ValueError) as exc_info:
+E       Failed: DID NOT RAISE ValueError
+
+member_xyf\test_records.py:335: Failed</failure></testcase></testsuite></testsuites>
