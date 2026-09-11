@@ -1,8 +1,114 @@
 {
-  "run_started_at": "2026-09-11T08:44:42",
-  "run_finished_at": "2026-09-11T08:44:43",
+  "run_started_at": "2026-09-11T10:38:55",
+  "run_finished_at": "2026-09-11T10:38:56",
   "base_url": "http://127.0.0.1:5000",
   "web_url": "http://127.0.0.1:5173",
-  "case_count": 0,
-  "results": []
+  "case_count": 15,
+  "results": [
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_rejects_non_string",
+      "case_id": "TC2-REC-01",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "8 种非字符串输入均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_rejects_blank_only",
+      "case_id": "TC2-REC-02",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "6 种纯空白输入均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_is_stripped",
+      "case_id": "TC2-REC-03",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "输入 ' trash '，返回值 detected_type='trash'"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_length_upper_bound",
+      "case_id": "TC2-REC-04",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "长度 50 通过、51 拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_length_lower_bound",
+      "case_id": "TC2-REC-05",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "长度 1 通过、0（空串）拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_detected_type_non_ascii",
+      "case_id": "TC2-REC-06",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "3 个非 ASCII 样本原样通过"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_confidence_accepts_numeric_string",
+      "case_id": "TC2-REC-07",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "5 个数字字符串均被转换为对应数值"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_confidence_rejects_non_numeric_string",
+      "case_id": "TC2-REC-08",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "5 个非数字字符串均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_confidence_int_ok_but_bool_rejected",
+      "case_id": "TC2-REC-09",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "整数 0/1 通过；布尔 True/False 被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_confidence_rejects_out_of_range",
+      "case_id": "TC2-REC-10",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "4 个越界值均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_confidence_return_type_is_float",
+      "case_id": "TC2-REC-11",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "0.5 与 '0.5' 的返回值类型均为 float"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_is_trash_rejects_non_bool",
+      "case_id": "TC2-REC-12",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "7 种非布尔输入均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_is_trash_accepts_bool",
+      "case_id": "TC2-REC-13",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "True/False 均通过并原样返回"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_update_mode_validates_given_fields",
+      "case_id": "TC2-REC-14",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "update 传入非法 confidence / detected_type 均被拒绝"
+    },
+    {
+      "nodeid": "member_xyf/test_records.py::test_update_mode_returns_only_given_fields",
+      "case_id": "TC2-REC-15",
+      "duration": 0.0,
+      "status": "passed",
+      "actual": "仅传入的字段被回传，未传入的不出现在返回值中"
+    }
+  ]
 }
