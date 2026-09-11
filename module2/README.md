@@ -84,13 +84,12 @@ python -m pytest --lf -v               # 只重跑上次失败的
 
 与模块一相同，`common/` 封装两个模块共用的支撑能力：`paths.py`（地址/账号/常量）、`api_client.py`（接口封装）、`assertions.py`（统一断言与实际结果记录）、`assets.py`（测试数据准备）、`ui.py`（浏览器驱动与页面基类）。
 
-模块二是 AI 融合阶段，额外提供 `ai_assist.py` 作为**“AI 如何参与测试”的唯一接入点**，与具体大模型解耦，预置三类骨架：
+模块二是 AI 融合阶段，额外提供 `ai_assist.py` 作为 **AI 生成测试数据与用例草稿的汇聚点**：
 
-- `generate_cases()`：把被测函数/接口描述交给 LLM，批量产出用例草稿，人工审校后固化；
-- `infer_expectation()`：让 LLM 依据接口契约推断“合理期望”，与真实响应比对，检出语义级缺陷；
-- `analyze_failures()`：把 pytest 失败输出交给 LLM 做归因与修复建议。
+- 按侧重分组的**测试数据**（如 `NON_STRING_DETECTED_TYPES`、`NUMERIC_STRING_CONFIDENCE`、`IS_TRASH_NON_BOOL` 等），供各成员用例逐条断言具体预期；
+- **用例目录** `CASE_CATALOG` 与生成器 `generate_cases()`，导出为各成员目录下的 `ai_cases.json`。
 
-三者均为待实现骨架；密钥一律走环境变量，不写进仓库。
+数据与用例均为离线、确定性内容，不需要网络或大模型密钥；如需接入真实 LLM，可设置 `MODULE2_AI_BACKEND` 后在 `ai_assist._client()` 实现（密钥一律走环境变量，不写进仓库）。
 
 ## 五、模块二用例规划
 
@@ -99,8 +98,8 @@ python -m pytest --lf -v               # 只重跑上次失败的
 | 模块 | 负责人 | 规划用例数 | 已编写 |
 |---|---|---|---|
 | 检测模块（`/detect`） | 罗时伦 | 待定 | 0 |
-| 检测记录模块（`/records`） | 肖云峰 | 待定 | 0 |
-| **合计** | | **≥15** | **0** |
+| 检测记录模块（`/records`） | 肖云峰 | 15 | 15 |
+| **合计** | | **≥15** | **15** |
 
 各模块的用工清单占位见 `member_lsl/README.md` 与 `member_xyf/README.md`。
 

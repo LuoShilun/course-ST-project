@@ -9,6 +9,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ASSETS_DIR = PROJECT_ROOT / "assets"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 SCREENSHOT_DIR = REPORTS_DIR / "screenshots"
+# web_system 后端源码根目录：单元测试直接 import 被测函数时用它注入 sys.path
+BACKEND_ROOT = PROJECT_ROOT.parent / "web_system" / "backend"
 
 BASE_URL = os.getenv("HXZJ_BASE_URL", "http://127.0.0.1:5000").rstrip("/")
 WEB_URL = os.getenv("HXZJ_WEB_URL", "http://127.0.0.1:5173").rstrip("/")

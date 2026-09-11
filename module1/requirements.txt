@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # 海迅智检测试工程依赖（Python 3.12+）
 pytest>=9.0
 requests>=2.32
