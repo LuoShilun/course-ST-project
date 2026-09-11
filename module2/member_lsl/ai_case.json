@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "kind": "generate_cases",
+    "backend": "recorded",
+    "provider": "DeepSeek-V4-Flash（本次实践所用的AI编码代理）",
+    "generated_at": "2026-09-11",
+    "target": "海迅智检 检测模块（页面 /detect 与接口 /api/detection/*）",
+    "method": "boundary + equivalence + property",
+    "prompt": "被测对象：海迅智检/web_system 的检测模块，页面 /detect 调用接口 POST /api/detection/image（multipart：file、model_key、score_thresh、use_cyclegan、robot_id）、POST /api/detection/video、GET /api/detection/video/tasks/{id}、GET /api/detection/realtime/sessions/{id}、GET /api/detection/models。请用边界值、等价类与性质测试的方法，生成 15 条接口级测试用例草稿，每条给出 title / method / input / expected。",
+    "note": "以下 cases 为 AI 原始输出，未经任何人工修改；人工审校结论见human_review。",
+    "ai_reported_count": 15
+  },
+  "cases": [
+    {
+      "case_id": "A-01",
+      "title": "获取检测模型列表，检查返回结构与字段",
+      "method": "等价类划分",
+      "input": "GET /api/detection/models，携带 user1 的 JWT",
+      "expected": "HTTP 200，data.models 为非空数组，每项含 key、display_name",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-02",
+      "title": "图片检测应返回标注图",
+      "method": "等价类划分",
+      "input": "POST /api/detection/image，上传真实水下图像，model_key=student.pt",
+      "expected": "HTTP 200，响应中含 annotated_image 字段",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-03",
+      "title": "检测结果的置信度应在 0 到 1 之间",
+      "method": "边界值分析",
+      "input": "上传含目标的水下图像并读取 data.detections[*].score",
+      "expected": "每个 score 都落在 [0,1]",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-04",
+      "title": "检测结果应包含目标框 bbox",
+      "method": "等价类划分",
+      "input": "上传含目标的水下图像并读取 data.detections[*].bbox",
+      "expected": "每个 detection 都有 bbox 字段，且为 4 个数",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-05",
+      "title": "summary 统计应与 detections 一致",
+      "method": "等价类划分",
+      "input": "上传含 Trash 与 Bio 的水下图像",
+      "expected": "data.summary.total 等于 detections 的长度",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-06",
+      "title": "传入不存在的模型 key",
+      "method": "错误推测法",
+      "input": "POST /api/detection/image，model_key=not-exist.pt",
+      "expected": "接口报错（4xx）",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-07",
+      "title": "置信度阈值传入 NaN",
+      "method": "边界值分析",
+      "input": "score_thresh=float('nan')",
+      "expected": "接口应拒绝该阈值并返回 4xx",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-08",
+      "title": "极小尺寸图片",
+      "method": "边界值分析",
+      "input": "上传 1x1 像素的 JPEG",
+      "expected": "接口不应崩溃",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-09",
+      "title": "阈值越高检出目标不应越多",
+      "method": "性质测试",
+      "input": "同一张图分别用 score_thresh=0.05 与 0.95 检测",
+      "expected": "高阈值检出的目标数不超过低阈值",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-10",
+      "title": "视频任务状态流转",
+      "method": "场景法",
+      "input": "提交视频任务后轮询 GET /api/detection/video/tasks/{id}",
+      "expected": "状态最终变为 finished",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-11",
+      "title": "视频任务应处理到视频帧",
+      "method": "边界值分析",
+      "input": "提交 24 帧的 AVI 视频",
+      "expected": "result.frames_processed 小于 24 即视为通过",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-12",
+      "title": "实时会话停止后不再返回画面",
+      "method": "场景法",
+      "input": "启动实时会话→停止→再次请求 /frame",
+      "expected": "停止后取帧应返回 204",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-13",
+      "title": "图片检测的标注图应可被前端直接显示",
+      "method": "等价类划分",
+      "input": "读取 annotated_image 字符串",
+      "expected": "字符串以 data:image 开头",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-14",
+      "title": "重复检测同一张图片结果应一致",
+      "method": "性质测试",
+      "input": "用同一模型、同一阈值连续检测同一张图两次",
+      "expected": "两次检出目标数相同",
+      "ai_raw": true
+    },
+    {
+      "case_id": "A-15",
+      "title": "检测接口对超大图片的处理",
+      "method": "边界值分析",
+      "input": "上传 12000x12000 的 JPEG",
+      "expected": "接口返回 4xx 或正常处理，不应 500",
+      "ai_raw": true
+    }
+  ],
+  "human_review": [
+    {
+      "ai_case": "A-01",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-01",
+      "reason": "AI 只检查 key/display_name 两个字段，遗漏了 engine 与 size_mb；且未校验 engine 是否属于受控词表（yolo/fasterrcnn/student/onnx/mock）。人工补上词表枚举与 size_mb>0（mock-default 例外）。"
+    },
+    {
+      "ai_case": "A-02",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-03",
+      "reason": "AI 只断言字段“存在”，属于弱断言。人工改为：base64 解码 → PIL 打开 → 与原图宽高一致。"
+    },
+    {
+      "ai_case": "A-03",
+      "decision": "adopted",
+      "final_case_id": "TC2-DET-04",
+      "reason": "AI 建议正确，直接采用，并补充“class_name 与 is_trash 语义一致”这一 AI 没想到的交叉约束。"
+    },
+    {
+      "ai_case": "A-04",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-05",
+      "reason": "AI 只校验“是 4 个数”。人工改为几何合法性：0≤x1<x2≤图宽、0≤y1<y2≤图高，且坐标不得越界。"
+    },
+    {
+      "ai_case": "A-05",
+      "decision": "adopted",
+      "final_case_id": "TC2-DET-02",
+      "reason": "AI 建议正确且判别力强，采用，并同时校验 trash_count。"
+    },
+    {
+      "ai_case": "A-06",
+      "decision": "adopted",
+      "final_case_id": "TC2-DET-06",
+      "reason": "AI 建议正确。该条命中真实缺陷（BUG2-01），用例以 xfail(strict=True) 固化。"
+    },
+    {
+      "ai_case": "A-07",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-07",
+      "reason": "AI 给的输入是 Python 的 float('nan')，HTTP multipart 传输时会退化为字符串 'nan'，AI 没有意识到这一点。人工改为直接发送 'nan' / 'inf' / '1e-3' / '  0.5  ' 四种字符串形态。"
+    },
+    {
+      "ai_case": "A-08",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-08",
+      "reason": "AI 只说“不应崩溃”，不可判定的期望。人工改为双向期望：2xx 则必须落库；4xx 则必须不落库、不残留文件。"
+    },
+    {
+      "ai_case": "A-09",
+      "decision": "adopted",
+      "final_case_id": "TC2-DET-09",
+      "reason": "AI 提的单调性属于性质测试，有价值，采用并补充“等于阈值的目标应保留”。"
+    },
+    {
+      "ai_case": "A-10",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-12",
+      "reason": "AI 只断言终态 finished。人工补上状态机合法性与 progress 单调不减（中途出现回退即判失败）。"
+    },
+    {
+      "ai_case": "A-11",
+      "decision": "rejected_and_rewritten",
+      "final_case_id": "TC2-DET-13",
+      "reason": "AI 写“frames_processed 小于 24 即视为通过”，方向完全反了（应当是等于源视频帧数），这类反向断言是 AI 最危险的输出形态。人工重写为 ==24。"
+    },
+    {
+      "ai_case": "A-12",
+      "decision": "modified",
+      "final_case_id": "TC2-DET-14",
+      "reason": "AI 只允许 204。实际实现可能返回 404/403，人工放宽为 {204,404,403} 且明确“必须不含画面”。"
+    },
+    {
+      "ai_case": "A-13",
+      "decision": "merged",
+      "final_case_id": "TC2-DET-03",
+      "reason": "与 A-02 重复，合并进 TC2-DET-03。"
+    },
+    {
+      "ai_case": "A-14",
+      "decision": "adopted",
+      "final_case_id": "TC2-DET-11",
+      "reason": "AI 建议合理，采用。实测两次结果一致（模型为确定性推理）。"
+    },
+    {
+      "ai_case": "A-15",
+      "decision": "rejected",
+      "final_case_id": "",
+      "reason": "12000x12000 图片会触发 Pillow 的 DecompressionBomb 保护并占用大量内存，风险高于收益；改用 1x1 与 4:1 极端宽高比（TC2-DET-08）替代。"
+    },
+    {
+      "ai_case": "（AI 未提出）",
+      "decision": "human_added",
+      "final_case_id": "TC2-DET-10",
+      "reason": "人工补充：图片扩展名与真实内容不一致（.png 里装 JPEG 字节）应被正常受理——AI 只想到了内容非法，没想到“扩展名欺骗”。"
+    },
+    {
+      "ai_case": "（AI 未提出）",
+      "decision": "human_added",
+      "final_case_id": "TC2-DET-15",
+      "reason": "人工补充：验证 AI 失败归因能力本身（元测试），用留档的真实失败输出检验 analyze_failures() 是否给出根因与修复建议。"
+    },
+    {
+      "ai_case": "（AI 推断的不变量 INV-MDL-03）",
+      "decision": "human_added_from_ai_invariant",
+      "final_case_id": "TC2-DET-16",
+      "reason": "AI 在追问“默认模型怎么来的”时补出一条跨字段不变量（default_model_key 必须存在于 models 列表），团队把它单独落成一条缺陷确认用例，命中真实缺陷 BUG2-02。"
+    }
+  ]
+}
